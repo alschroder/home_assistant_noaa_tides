@@ -122,13 +122,16 @@ class NOAATidesAndCurrentsSensor(Entity):
         tide_text = None
         most_recent = None
         for index, row in self.data.iterrows():
+            _LOGGER.debug("index = %s, most_recent = %s", index, most_recent)
             if most_recent == None or (index <= now and index > most_recent):
                 most_recent = index
             elif index > now:
                 self.attr["next_tide_time"] = index.strftime("%-I:%M %p")
                 self.attr["last_tide_time"] = most_recent.strftime("%-I:%M %p")
-                tide_factor = 0
-                predicted_period = (index - most_recent).seconds
+                self.attr["next_tide_level"] = row.predicted_wl
+                self.attr["last_tide_level"] = self.data[most_recent][predicted_wl]
+                #tide_factor = 0
+                #predicted_period = (index - most_recent).seconds
                 if row.hi_lo == "H":
                     self.attr["next_tide_type"] = "High"
                     self.attr["last_tide_type"] = "Low"
@@ -137,6 +140,7 @@ class NOAATidesAndCurrentsSensor(Entity):
                     self.attr["next_tide_type"] = "Low"
                     self.attr["last_tide_type"] = "High"
                     self.attr["low_tide_level"] = row.predicted_wl
+
                 self.update_tide_factor_from_attr()
                 return self.attr
         return self.attr
