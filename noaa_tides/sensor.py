@@ -133,7 +133,7 @@ class NOAATidesAndCurrentsSensor(Entity):
                 self.attr["next_tide_time"] = index.strftime("%-I:%M %p")
                 self.attr["next_tide_level"] = row.predicted_wl
                 self.attr["next_tide_type"] = "High" if row.hi_lo == "H" else "Low"
-            elif index > now and next_tide != None
+            elif index > now and next_tide != None:
                 self.attr["subsequent_tide_time"]  = index.strftime("%-I:%M %p")
                 self.attr["subsequent_tide_level"] = row.predicted_wl
                 self.attr["subsequent_tide_type"]  = "High" if row.hi_lo == "H" else "Low"
