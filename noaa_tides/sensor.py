@@ -119,27 +119,25 @@ class NOAATidesAndCurrentsSensor(Entity):
             return self.attr
 
         now = datetime.now()
-        tide_text = None
+        #tide_text = None
         most_recent = None
+        next_tide = None
         for index, row in self.data.iterrows():
             if most_recent == None or (index <= now and index > most_recent):
                 most_recent = index
                 self.attr["last_tide_level"] = row.predicted_wl
-            elif index > now:
+                self.attr["last_tide_type"] = "High" if row.hi_lo == "H" else "Low"
+                self.attr["last_tide_time"] = index.strftime("%-I:%M %p")
+            elif index > now and next_tide == None:
+                next_tide = index # next time around will be
                 self.attr["next_tide_time"] = index.strftime("%-I:%M %p")
-                self.attr["last_tide_time"] = most_recent.strftime("%-I:%M %p")
                 self.attr["next_tide_level"] = row.predicted_wl
-                #tide_factor = 0
-                #predicted_period = (index - most_recent).seconds
-                if row.hi_lo == "H":
-                    self.attr["next_tide_type"] = "High"
-                    self.attr["last_tide_type"] = "Low"
-                    self.attr["high_tide_level"] = row.predicted_wl
-                elif row.hi_lo == "L":
-                    self.attr["next_tide_type"] = "Low"
-                    self.attr["last_tide_type"] = "High"
-                    self.attr["low_tide_level"] = row.predicted_wl
-
+                self.attr["next_tide_type"] = "High" if row.hi_lo == "H" else "Low"
+            elif index > now and next_tide != None
+                self.attr["subsequent_tide_time"]  = index.strftime("%-I:%M %p")
+                self.attr["subsequent_tide_level"] = row.predicted_wl
+                self.attr["subsequent_tide_type"]  = "High" if row.hi_lo == "H" else "Low"
+                # we have all the data we need, update tide factor and return
                 self.update_tide_factor_from_attr()
                 return self.attr
         return self.attr
